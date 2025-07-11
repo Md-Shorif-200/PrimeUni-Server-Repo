@@ -31,9 +31,11 @@ async function run() {
         const db = client.db('prime-uni-db');
 
         const userCollections = db.collection('users');
+        const collegeCollections = db.collection('Colleges')
+        const admissionCollections = db.collection('admission')
 
 
-        //! user related api
+        //! ------------------- user related api
 
         app.post('/prime-uni/api/users',async(req,res) => {
        const newUser = req.body;
@@ -60,6 +62,26 @@ async function run() {
         app.get('/prime-uni/api/users',async(req,res) => {
               const result = await userCollections.find().toArray();
               res.send(result)
+        })
+
+        // get college collections
+        app.get('/api/colleges', async(req,res) => {
+            const result = await collegeCollections.find().toArray();
+            res.send(result)
+        })
+
+        // ! --------------------- admission related api
+
+         app.post('/api/admission',async(req,res) => {
+             const data = req.body;
+             const result = await admissionCollections.insertOne(data);
+             res.send(result)
+         })
+
+        //  get api
+        app.get('/api/admission', async(req,res) => {
+            const result = await admissionCollections.find().toArray();
+            res.send(result)
         })
 
 
