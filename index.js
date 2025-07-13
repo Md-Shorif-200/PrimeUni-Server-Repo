@@ -8,7 +8,12 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 // middleware
 
 app.use(express.json());
-app.use(cors())
+app.use(cors({
+  origin : [
+     'http://localhost:3000',
+     'https://prime-uni-client-repo.vercel.app'
+  ]
+}))
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.56yvv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -25,7 +30,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
         // ! database collections
         const db = client.db('prime-uni-db');
@@ -33,6 +38,7 @@ async function run() {
         const userCollections = db.collection('users');
         const collegeCollections = db.collection('Colleges')
         const admissionCollections = db.collection('admission')
+        const feedbackCollections = db.collection('feedbacks')
 
 
         //! ------------------- user related api
@@ -84,11 +90,27 @@ async function run() {
             res.send(result)
         })
 
+        
+        // ! --------------------- feedback related api
+
+         app.post('/api/feedback',async(req,res) => {
+             const data = req.body;
+             const result = await feedbackCollections.insertOne(data);
+             res.send(result)
+         })
+
+        //  get api
+        app.get('/api/feedback', async(req,res) => {
+            const result = await feedbackCollections.find().toArray();
+            res.send(result)
+        })
+
+
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
